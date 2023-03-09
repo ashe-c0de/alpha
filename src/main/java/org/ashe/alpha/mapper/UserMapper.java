@@ -9,4 +9,6 @@ import org.ashe.alpha.domain.model.User;
 public interface UserMapper extends BaseMapper<User> {
 
     User loadUserByUsername(@Param("clientId") String clientId, @Param("account") String username);
+
+    User getUserByAccount(String account);
 }

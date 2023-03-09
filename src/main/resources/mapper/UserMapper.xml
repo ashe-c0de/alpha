@@ -9,7 +9,15 @@
         from user
         where account = #{account}
           and client_id = #{clientId}
-        and status = 0
+          and status = 0
         limit 1
+    </select>
+
+    <!-- 根据账户查询用户 -->
+    <select id="getUserByAccount" resultType="org.ashe.alpha.domain.model.User">
+        select id, account, password
+        from user
+        where account = #{account}
+        and del_flag = 0
     </select>
 </mapper>
