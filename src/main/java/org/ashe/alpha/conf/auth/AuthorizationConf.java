@@ -52,9 +52,21 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) {
         security
-                .tokenKeyAccess("permitAll()") // ouath/token_key放行
-                .checkTokenAccess("permitAll()") // oauth/check_token放行
-                .allowFormAuthenticationForClients(); // 表单认证，申请令牌
+                /*
+                    /oauth/token_key    资源服务验证token接口放行
+                    资源服务拿到token后，根据已知的算法和签名密钥去校验token
+                    不必调用资源服务接口来验证token
+                 */
+                .tokenKeyAccess("permitAll()")
+                /*
+                    oauth/check_token    授权服务验证token接口放行
+                 */
+                .checkTokenAccess("permitAll()")
+                /*
+                     创建ClientCredentialsTokenEndpointFilter对请求auth/token拦截
+                     并获取client_id和client_secret进行身份认证
+                 */
+                .allowFormAuthenticationForClients();
     }
 
     /**
@@ -62,20 +74,7 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                // 内存中配置客户端
-                .inMemory()
-                .withClient("c1")
-                .secret(passwordEncoder.encode("s1"))
-                .resourceIds("app")
-                .authorizedGrantTypes("authorization_code",
-                        "password",
-                        "client_credentials",
-                        "implicit",
-                        "refresh_token")
-                .scopes("all")
-                .autoApprove(false)
-                .redirectUris("https://www.baidu.com");
+        clients.withClientDetails(clientDetailsService);
     }
 
     /**
@@ -97,11 +96,11 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
     }
 
     /**
-     * 配置授权服务器token管理的设置
+     * 授权服务器token管理的配置
      */
     public AuthorizationServerTokenServices tokenServices() {
-        DefaultTokenServices services = new DefaultTokenServices();
-        services.setClientDetailsService(clientDetailsService); // 配置自定义的客户端信息--基于内存
+        DefaultTokenServices services = new DefaultTokenServices(); // 使用默认的token服务
+        services.setClientDetailsService(clientDetailsService); // 配置客户端信息--自定义基于内存
         services.setSupportRefreshToken(true); // 允许token自动刷新
         services.setTokenStore(tokenStore); // 设置令牌储存方式--此时注入的tokenStore是基于内存的
         services.setAccessTokenValiditySeconds(7200); // token有效期2小时

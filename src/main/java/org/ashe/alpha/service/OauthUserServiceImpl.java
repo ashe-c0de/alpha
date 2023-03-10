@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Slf4j
-public class UserServiceImpl extends ServiceImpl<OauthUserMapper, OauthUser> implements OauthUserService {
+public class OauthUserServiceImpl extends ServiceImpl<OauthUserMapper, OauthUser> implements OauthUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
