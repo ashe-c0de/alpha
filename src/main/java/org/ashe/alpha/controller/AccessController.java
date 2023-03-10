@@ -3,11 +3,8 @@ package org.ashe.alpha.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.ashe.alpha.domain.dto.RegisterDTO;
 import org.ashe.alpha.domain.vo.resp.RespBody;
-import org.ashe.alpha.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.ashe.alpha.service.OauthUserService;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -15,10 +12,11 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-public class HelloController {
+@RequestMapping("/access")
+public class AccessController {
 
     @Resource
-    private UserService userService;
+    private OauthUserService oauthUserService;
 
     @GetMapping("hello")
     public String hello() {
@@ -30,6 +28,6 @@ public class HelloController {
      */
     @PostMapping("/register")
     public RespBody<Void> register(@RequestBody @Valid RegisterDTO dto, HttpServletRequest request) {
-        return userService.register(dto, request);
+        return oauthUserService.register(dto, request);
     }
 }

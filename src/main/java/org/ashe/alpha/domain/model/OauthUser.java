@@ -1,5 +1,6 @@
 package org.ashe.alpha.domain.model;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,8 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class User implements Serializable {
+@TableName("user")
+public class OauthUser implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
