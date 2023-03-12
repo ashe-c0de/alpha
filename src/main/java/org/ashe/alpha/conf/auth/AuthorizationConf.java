@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import javax.annotation.Resource;
 
@@ -22,9 +23,6 @@ import javax.annotation.Resource;
  */
 @Configuration
 public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
-
-    @Resource
-    private PasswordEncoder passwordEncoder;
 
     @Resource
     private AuthenticationManager authenticationManager;
@@ -38,12 +36,18 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
     @Resource
     private TokenStore tokenStore;
 
+    @Resource
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+
     /**
      * configure(ClientDetailsServiceConfigurer clients)
-     * 通过重写此方法，已经配置了————客户端信息对应实例
+     * 通过此方法，已经配置了————客户端信息对应实例
      */
     @Resource
     private ClientDetailsService clientDetailsService;
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
 
 
     /**
@@ -74,8 +78,24 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.withClientDetails(clientDetailsService);
+//        clients.withClientDetails(clientDetailsServiceImpl);
+        clients
+                // 内存中配置客户端
+                .inMemory()
+                .withClient("c1")
+                .secret(passwordEncoder.encode("s1"))
+                // 可设置对应工号
+                .resourceIds("app")
+                .authorizedGrantTypes("authorization_code",
+                        "password",
+                        "client_credentials",
+                        "implicit",
+                        "refresh_token")
+                .scopes("all")
+                .autoApprove(false)
+                .redirectUris("https://www.baidu.com");
     }
+
 
     /**
      * token端点配置
@@ -102,7 +122,8 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
         DefaultTokenServices services = new DefaultTokenServices(); // 使用默认的token服务
         services.setClientDetailsService(clientDetailsService); // 配置客户端信息--自定义基于内存
         services.setSupportRefreshToken(true); // 允许token自动刷新
-        services.setTokenStore(tokenStore); // 设置令牌储存方式--此时注入的tokenStore是基于内存的
+        services.setTokenStore(tokenStore); // 设置令牌储存方式--此时注入的tokenStore是JWT令牌
+        services.setTokenEnhancer(jwtAccessTokenConverter); // token增强
         services.setAccessTokenValiditySeconds(7200); // token有效期2小时
         services.setRefreshTokenValiditySeconds(259200); // 刷新token有效期3天
         return services;

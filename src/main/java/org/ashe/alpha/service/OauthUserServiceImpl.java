@@ -9,16 +9,20 @@ import org.ashe.alpha.domain.model.OauthUser;
 import org.ashe.alpha.domain.vo.exc.BusinessException;
 import org.ashe.alpha.domain.vo.resp.RespBody;
 import org.ashe.alpha.mapper.OauthUserMapper;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @Service
 @Slf4j
 public class OauthUserServiceImpl extends ServiceImpl<OauthUserMapper, OauthUser> implements OauthUserService {
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -38,7 +42,7 @@ public class OauthUserServiceImpl extends ServiceImpl<OauthUserMapper, OauthUser
         OauthUser user = new OauthUser();
         user.setAccount(dto.getAccount());
         // 密码加密
-        String encodePassword = new BCryptPasswordEncoder().encode(dto.getPassword());
+        String encodePassword = passwordEncoder.encode(dto.getPassword());
         user.setPassword(encodePassword);
         // clientId取account
         user.setClientId(dto.getAccount());
