@@ -6,14 +6,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.oauth2.provider.ClientDetails;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.*;
 
 @Getter
 @Setter
 @TableName("client_details")
-public class OauthClientDetails implements Serializable {
+public class OauthClientDetails implements ClientDetails, Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -93,4 +96,85 @@ public class OauthClientDetails implements Serializable {
      */
     private String autoApprove;
 
+    private Set<String> composeSet(String str) {
+        return new HashSet<>(Arrays.asList(str.split(",")));
+    }
+
+    @Override
+    public String getClientId() {
+        return this.clientId;
+    }
+
+    @Override
+    public Set<String> getResourceIds() {
+        return composeSet(this.resourceIds);
+    }
+
+    /**
+     * Whether a secret is required to authenticate this client.
+     *
+     * @return Whether a secret is required to authenticate this client.
+     */
+    @Override
+    public boolean isSecretRequired() {
+        return true;
+    }
+
+    @Override
+    public String getClientSecret() {
+        return this.clientSecret;
+    }
+
+    /**
+     * Whether this client is limited to a specific scope. If false, the scope of the authentication request will be
+     * ignored.
+     *
+     * @return Whether this client is limited to a specific scope.
+     */
+    @Override
+    public boolean isScoped() {
+        return true;
+    }
+
+    @Override
+    public Set<String> getScope() {
+        return composeSet(scope);
+    }
+
+
+    @Override
+    public Set<String> getAuthorizedGrantTypes() {
+        return composeSet(this.authorizedGrantTypes);
+    }
+
+    @Override
+    public Set<String> getRegisteredRedirectUri() {
+        return composeSet(this.webServerRedirectUri);
+    }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities() {
+        return (authorities != null && authorities.trim().length() > 0) ?
+                AuthorityUtils.commaSeparatedStringToAuthorityList(authorities) : Collections.emptyList();
+    }
+
+    @Override
+    public Integer getAccessTokenValiditySeconds() {
+        return Integer.valueOf(this.accessTokenValidity);
+    }
+
+    @Override
+    public Integer getRefreshTokenValiditySeconds() {
+        return Integer.valueOf(this.refreshTokenValidity);
+    }
+
+    @Override
+    public boolean isAutoApprove(String scope) {
+        return Boolean.parseBoolean(this.autoApprove);
+    }
+
+    @Override
+    public Map<String, Object> getAdditionalInformation() {
+        return Collections.emptyMap();
+    }
 }

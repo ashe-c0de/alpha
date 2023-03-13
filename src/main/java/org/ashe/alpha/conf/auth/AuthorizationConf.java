@@ -1,10 +1,10 @@
 package org.ashe.alpha.conf.auth;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
@@ -43,11 +43,11 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
      * configure(ClientDetailsServiceConfigurer clients)
      * 通过此方法，已经配置了————客户端信息对应实例
      */
-    @Resource
-    private ClientDetailsService clientDetailsService;
-    @Resource
-    private PasswordEncoder passwordEncoder;
+    private final ClientDetailsService clientDetailsService;
 
+    public AuthorizationConf(@Qualifier(value = "clientDetailsServiceImpl") ClientDetailsService clientDetailsService) {
+        this.clientDetailsService = clientDetailsService;
+    }
 
 
     /**
@@ -75,25 +75,25 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
 
     /**
      * 配置客户端信息服务
+     * clients
+     *                 // 内存中配置客户端
+     *                 .inMemory()
+     *                 .withClient("c1")
+     *                 .secret(passwordEncoder.encode("s1"))
+     *                 // 可设置对应工号 ？
+     *                 .resourceIds("app")
+     *                 .authorizedGrantTypes("authorization_code",
+     *                         "password",
+     *                         "client_credentials",
+     *                         "implicit",
+     *                         "refresh_token")
+     *                 .scopes("all")
+     *                 .autoApprove(false)
+     *                 .redirectUris("<a href="https://www.baidu.com">...</a>");
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-//        clients.withClientDetails(clientDetailsServiceImpl);
-        clients
-                // 内存中配置客户端
-                .inMemory()
-                .withClient("c1")
-                .secret(passwordEncoder.encode("s1"))
-                // 可设置对应工号
-                .resourceIds("app")
-                .authorizedGrantTypes("authorization_code",
-                        "password",
-                        "client_credentials",
-                        "implicit",
-                        "refresh_token")
-                .scopes("all")
-                .autoApprove(false)
-                .redirectUris("https://www.baidu.com");
+        clients.withClientDetails(clientDetailsService);
     }
 
 
