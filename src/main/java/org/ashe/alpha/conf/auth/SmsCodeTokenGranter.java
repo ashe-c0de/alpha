@@ -11,6 +11,9 @@ import org.springframework.util.ObjectUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 自定义短信验证码授权
+ */
 public class SmsCodeTokenGranter extends AbstractTokenGranter {
 
     /**
@@ -24,12 +27,12 @@ public class SmsCodeTokenGranter extends AbstractTokenGranter {
     private static final String GRANT_TYPE = "sms_code";
 
     public SmsCodeTokenGranter(AuthorizationServerTokenServices tokenServices,
-                                         ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory) {
+                               ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory) {
         this(tokenServices, clientDetailsService, requestFactory, GRANT_TYPE);
     }
 
     protected SmsCodeTokenGranter(AuthorizationServerTokenServices tokenServices,
-                                            ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory, String grantType) {
+                                  ClientDetailsService clientDetailsService, OAuth2RequestFactory requestFactory, String grantType) {
         super(tokenServices, clientDetailsService, requestFactory, grantType);
     }
 

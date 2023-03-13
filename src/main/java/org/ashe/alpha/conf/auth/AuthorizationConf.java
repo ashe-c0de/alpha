@@ -147,8 +147,10 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
         // 构建短信验证授权类型
         SmsCodeTokenGranter smsCodeTokenGranter = new SmsCodeTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(),
                 endpoints.getOAuth2RequestFactory());
+
         // 向集合中添加短信授权类型
         granterList.add(smsCodeTokenGranter);
+
         // 返回所有类型
         return new CompositeTokenGranter(granterList);
     }
