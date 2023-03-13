@@ -19,18 +19,20 @@ public class BeanConf {
     private static final String SIGN_KEY = "Little pigs, little pigs, let me come in.";
 
     /**
-     * 注入普通令牌/JWT令牌
+     * 注入JWT令牌
+     * <>p</>
+     * 基于内存的普通令牌
+     * return new InMemoryTokenStore();
      */
     @Bean
     public TokenStore tokenStore(){
-        // 基于内存的普通令牌
-//        return new InMemoryTokenStore();
         // jwt令牌
         return new JwtTokenStore(jwtAccessTokenConverter());
     }
 
     /**
-     * 自定义私钥加密
+     * 注入jwt格式token转换器
+     * 按规定私钥转换
      */
     @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter(){
@@ -40,7 +42,7 @@ public class BeanConf {
     }
 
     /**
-     * 向IOC注入BCrypt密码编码器
+     * 注入BCrypt密码编码器
      */
     @Bean
     public PasswordEncoder injectPE() {

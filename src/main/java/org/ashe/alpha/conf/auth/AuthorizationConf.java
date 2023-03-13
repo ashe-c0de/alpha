@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
@@ -17,6 +19,9 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 授权服务器自定义配置
@@ -112,7 +117,9 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
                 // 使用自定义的token管理服务
                 .tokenServices(tokenServices())
                 // 端点验证的请求方式
-                .allowedTokenEndpointRequestMethods(HttpMethod.POST);
+                .allowedTokenEndpointRequestMethods(HttpMethod.POST)
+                // 使用加入了自定义认证的tokenGranter——短信验证码
+                .tokenGranter(tokenGranter(endpoints));
     }
 
     /**
@@ -127,5 +134,22 @@ public class AuthorizationConf extends AuthorizationServerConfigurerAdapter {
         services.setAccessTokenValiditySeconds(7200); // token有效期2小时
         services.setRefreshTokenValiditySeconds(259200); // 刷新token有效期3天
         return services;
+    }
+
+    /**
+     * 添加自定义授权类型
+     */
+    private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
+
+        // endpoints.getTokenGranter() 获取SpringSecurity OAuth2.0 现有的授权类型
+        List<TokenGranter> granterList = new ArrayList<>(Collections.singletonList(endpoints.getTokenGranter()));
+
+        // 构建短信验证授权类型
+        SmsCodeTokenGranter smsCodeTokenGranter = new SmsCodeTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(),
+                endpoints.getOAuth2RequestFactory());
+        // 向集合中添加短信授权类型
+        granterList.add(smsCodeTokenGranter);
+        // 返回所有类型
+        return new CompositeTokenGranter(granterList);
     }
 }
