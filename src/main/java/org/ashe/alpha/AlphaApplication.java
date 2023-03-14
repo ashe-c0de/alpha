@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 
 @EnableAuthorizationServer // 开启授权服务器
 @SpringBootApplication
-@MapperScan("org.ashe.alpha.mapper")
+@MapperScan("org.ashe.alpha.**.mapper")
 public class AlphaApplication {
 
 	public static void main(String[] args) {
