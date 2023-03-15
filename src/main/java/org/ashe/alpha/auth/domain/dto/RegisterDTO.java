@@ -22,5 +22,9 @@ public class RegisterDTO {
      * 密码
      */
     private String password;
+    /**
+     * 工号
+     */
+    private String uCode;
 
 }

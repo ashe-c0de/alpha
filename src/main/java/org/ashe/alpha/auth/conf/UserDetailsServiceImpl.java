@@ -3,8 +3,6 @@ package org.ashe.alpha.auth.conf;
 import lombok.extern.slf4j.Slf4j;
 import org.ashe.alpha.auth.domain.model.OauthUser;
 import org.ashe.alpha.auth.service.OauthUserService;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (ObjectUtils.isEmpty(oauthUser)) {
             throw new UsernameNotFoundException("用户或密码错误");
         }
-        return new User(oauthUser.getAccount(), oauthUser.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList("admin,user"));
+        return oauthUser;
     }
 
 }

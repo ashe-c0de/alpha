@@ -20,7 +20,7 @@ import javax.validation.Valid;
  * 需要登录甚至另需一定权限才能访问的接口
  */
 @RestController
-@EnableResourceServer
+@EnableResourceServer // 标识这是一个资源服务器，需要授权认证
 @RequestMapping("/auth")
 public class PermissionController {
 

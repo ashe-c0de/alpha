@@ -5,7 +5,7 @@
 
 
     <select id="loadUserByUsername" resultType="org.ashe.alpha.auth.domain.model.OauthUser">
-        select id, account, password
+        select id, account, password, u_code
         from user
         where account = #{account}
           and status = 0

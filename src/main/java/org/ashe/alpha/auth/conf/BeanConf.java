@@ -36,7 +36,7 @@ public class BeanConf {
      */
     @Bean
     public JwtAccessTokenConverter jwtAccessTokenConverter(){
-        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+        JwtAccessTokenConverter jwtAccessTokenConverter = new CustomJwtAccessTokenConverter();
         jwtAccessTokenConverter.setSigningKey(SIGN_KEY);
         return jwtAccessTokenConverter;
     }
